@@ -550,12 +550,12 @@ movegui(fh,'onscreen');
                 if strcmp(state,'define_zl1') || strcmp(state,'define_zl2')
                     data=getappdata(0, 'zl_data');
                 elseif strcmp(state,'define_edge') || strcmp(state,'refine_edge')
-                  switch index
-                    case 2
+                  switch selected_tab
+                    case tab2
                       data_str='edge_data';  
-                    case 3
+                    case tab3
                       data_str='fe_data';
-                    case 4
+                    case tab4
                       data_str='general_data';
                   end              
                   data=getappdata(0,data_str);
@@ -564,14 +564,14 @@ movegui(fh,'onscreen');
                 end
                 x(1)=pos1(1,1);
                 x(2)=x(1);
-                y=YLim;               
+                y=YLim1;               
                 cla(data_in);
                 axes(data_in);
                 
                 plot(data_in, data.x,data.y,'b-');
                 hold on;
                 plot(data_in, x,y,'r--');
-                if index==4
+                if selected_tab==tab4
                    xrange=getappdata(0,'XLim');
                    yrange=getappdata(0,'YLim');
                    set(data_in, 'XLim', xrange);
@@ -585,7 +585,7 @@ movegui(fh,'onscreen');
                 if strcmp(state, 'define_zl2') 
                    x(1)=str2double(get(edgelpos_txt,'string'));
                    x(2)=x(1);
-                   y=YLim;
+                   y=YLim1;
                    plot(data_in,x,y,'r-');                     
                 end
                 
@@ -593,16 +593,16 @@ movegui(fh,'onscreen');
             %%define the arcus_tan function
             elseif strcmp(state,'define_atan1') || strcmp(state,'define_atan2') ||...
                     strcmp(state,'define_atan3')
-                 switch index
-                    case 3  
+                 switch selected_tab
+                    case tab3
                         data=getappdata(0, 'fe_data');
-                    case 4
+                    case tab4
                         data=getappdata(0, 'general_data');
                   end  
                
                 x(1)=pos1(1,1);
                 x(2)=x(1);
-                y=YLim;               
+                y=YLim1;               
                 cla(data_in);
                 axes(data_in);
                 plot(data_in, data.x,data.y,'b.');                
@@ -612,13 +612,13 @@ movegui(fh,'onscreen');
                    atan_data=getappdata(0,'atan_data');
                    x(1)=atan_data.zero;
                    x(2)=x(1);
-                   y=Ylim;
+                   y=YLim1;
                    plot(data_in,x,y,'r-');
                    if strcmp(state, 'define_atan3')
                        atan_data=getappdata(0,'atan_data');
                        x(1)=atan_data.h1;
                        x(2)=x(1);
-                       y=Ylim;
+                       y=YLim1;
                        plot(data_in,x,y,'r-');
                    end
                 end 
@@ -629,7 +629,7 @@ movegui(fh,'onscreen');
                fit_data=getappdata(0,'fitbkg_data');
                x(1)=fit_data.bd1;
                x(2)=x(1);
-               y=YLim;
+               y=YLim1;
                plot(data_in,x,y,'r-'); 
             end
             
@@ -788,11 +788,11 @@ movegui(fh,'onscreen');
            elseif strcmp(state, 'define_atan2')
                atan_data=getappdata(0,'atan_data');
                atan_data.h1=pos(1,1);
-               if index==3
+               if selected_tab==tab3
                  set(h1_txt,'String',num2str(atan_data.h1));
                end
                setappdata(0, 'atan_data', atan_data);               
-               if index==4 && get(ti_atan_cb,'value')
+               if selected_tab==tab4 && get(ti_atan_cb,'value')
                   setappdata(0,'state','normal');
                   ev_tan();
                else
@@ -804,11 +804,11 @@ movegui(fh,'onscreen');
                setappdata(0,'state', 'normal');
                atan_data.h2=pos(1,1);
                setappdata(0, 'atan_data', atan_data);
-               switch index
-                 case 3  
+               switch selected_tab
+                 case tab3
                    calc_fe();
                    set(h2_txt,'String',num2str(atan_data.h2));
-                 case 4
+                 case tab4
                    ev_tan();
                end  
                set(msg_lbl,'String', ''); 
@@ -867,8 +867,8 @@ movegui(fh,'onscreen');
     end
 
     function savel_btn_click(hObject, eventdata)
-       selected_index=get(hTabGroup,'SelectedTab');
-        switch selected_index
+       selected_tab=get(hTabGroup,'SelectedTab');
+        switch selected_tab
             case tab1
                 data_out=data_out1;
             case tab2
@@ -968,9 +968,9 @@ movegui(fh,'onscreen');
 
 
     function define_edge(pos)
-       selected_index=get(hTabGroup,'SelectedTab');
+       selected_tab=get(hTabGroup,'SelectedTab');
        data_str='';
-       switch selected_index
+       switch selected_tab
          case tab2
            data_str='edge_data';
            data_in=data_in2;
@@ -1004,7 +1004,7 @@ movegui(fh,'onscreen');
        
        setappdata(0,data_str,data);
        
-       if selected_index==4     
+       if selected_tab==tab4    
            setappdata(0, 'fit_data', data);
 %            plot_all();
        end
