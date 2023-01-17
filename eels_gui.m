@@ -8,7 +8,7 @@ function varargout = eels_gui(varargin)
 %  Initialization tasks
 width=800;
 height=600;
-fh=figure('Visible','off','Name', 'EELS Analysis',...
+fh=figure('Visible','off','Name', 'EELS Analysis 2023',...
     'resize','on','position',[200 200 width height],'MenuBar', 'none',...
     'ToolBar','none','WindowButtonMotionFcn',@fh_WindowButtonMotionFcn,... 
     'NumberTitle', 'off','WindowButtonDownFcn', @fh_WindowButtonDownFcn,...
@@ -76,21 +76,21 @@ I0LL_lbl=uicontrol(tab1, 'style', 'text', 'horizontalalignment','right',...
 %*************************Text group*********************************
 
 edgelpos_txt=uicontrol(tab1,'Style', 'edit','Horizontalalignment','right',...
-    'backgroundcolor', [1 1 1], 'Position', [75 255 60 17],...
+    'backgroundcolor', [1 1 1], 'Position', [75 255 60 20],...
     'enable', 'inactive');
 edgerpos_txt=uicontrol(tab1,'Style', 'edit','Horizontalalignment','right',...
-    'backgroundcolor', [1 1 1], 'Position', [75 235 60 17],...
+    'backgroundcolor', [1 1 1], 'Position', [75 235 60 20],...
     'enable', 'inactive');
 
 fwhm_txt=uicontrol(tab1,'style','edit','HorizontalAlignment','right',...
-    'backgroundcolor', [1 1 1], 'Position', [75 205 60 17],...
+    'backgroundcolor', [1 1 1], 'Position', [75 205 60 20],...
     'Callback', @edit_cb);
 
 I0I_txt=uicontrol(tab1, 'style','edit','Horizontalalignment', 'right',...
-    'backgroundcolor', [1 1 1], 'Position', [75 185 60 17],...
+    'backgroundcolor', [1 1 1], 'Position', [75 185 60 20],...
     'Callback', @edit_cb);
 I0LL_txt=uicontrol(tab1,'style','edit','Horizontalalignment','right',...
-    'backgroundcolor', [1 1 1], 'Position', [75 165 60 17],...
+    'backgroundcolor', [1 1 1], 'Position', [75 165 60 20],...
     'Callback', @edit_cb);
 
 %************************defining buttons********************************
@@ -98,7 +98,15 @@ I0LL_txt=uicontrol(tab1,'style','edit','Horizontalalignment','right',...
 loadll_btn=uicontrol(tab1, 'Style', 'pushbutton','String','Load LL',...
     'Position', [10 280 125 30],'callback', @loadll_btn_click);
 definezl_btn=uicontrol(tab1,'style','pushbutton','String','Define Zero-Loss',...
-    'Position', [10 130 125 30],'callback', @definezl_btn_click);
+    'Position', [10 100 125 30],'callback', @definezl_btn_click);
+
+
+%************************defining 
+peak_shape_pop=uicontrol(tab1, 'style', 'popupmenu',...
+    'string',{'Lorentzian', 'Gaussian'},...
+    'Value', 1, 'horizontalalignment','right','Position', [10 140 125 20],...
+    'backgroundcolor',[1 1 1])
+
 
 
 %**********************************************************************
@@ -112,11 +120,13 @@ tab2 = uitab(hTabGroup, 'title','DatAna');
 loaddat_btn=uicontrol(tab2, 'Style', 'pushbutton','String','Load data',...
     'Position', [10 280 125 30],'callback', @loaddat_btn_click);
 defineedge_btn=uicontrol(tab2, 'Style', 'pushbutton', 'String','Define Edge',...
-    'Position', [40 230 95 22], 'callback', @defineedge_btn_click);
+    'Position', [40 225 95 27], 'callback', @defineedge_btn_click);
 fitbkg_btn=uicontrol(tab2,'Style', 'pushbutton', 'String', 'Fit Bkg',...
-    'Position', [40 155 95 22], 'callback', @fitbkg_btn_click);
+    'Position', [40 150 95 27], 'callback', @fitbkg_btn_click);
 decon_btn=uicontrol(tab2, 'Style', 'pushbutton', 'String', 'Deconvolute',...
-    'Position', [40 55 95 22], 'callback', @decon_btn_click);
+    'Position', [40 50 95 27], 'callback', @decon_btn_click);
+decon_frat_btn=uicontrol(tab2, 'Style', 'pushbutton', 'String', 'Frat',...
+    'Position', [40 20 95 27], 'callback', @decon_frat_click);
 
 %*************************defininge labls***************************
 peakpos_lbl=uicontrol(tab2, 'Style', 'text', 'String', 'Edgepos:',...
@@ -125,8 +135,8 @@ fitbkg_A_lbl=uicontrol(tab2, 'Style', 'text', 'String', 'A:',...
     'Position', [10 200 60 15], 'horizontalalignment', 'right');
 fitbkg_r_lbl=uicontrol(tab2, 'Style', 'text', 'String', 'r:',...
     'Position', [10 180 60 15], 'horizontalalignment','right');
-bkgfunc_lbl=uicontrol(tab2, 'Style', 'text', 'String','Bkg=A*E^-r', ...
-    'Position', [140 190 60 15], 'horizontalalignment', 'right');
+bkgfunc_lbl=uicontrol(tab2, 'Style', 'text', 'String','Bkg=A*E^-r  ', ...
+    'Position', [140 190 70 15], 'horizontalalignment', 'right');
 fwhm_decon_lbl=uicontrol(tab2, 'Style','text','String','FWHM:',...
     'Position', [10 102 60 15], 'horizontalalignment','right');
 zl_factor_lbl=uicontrol(tab2, 'Style', 'text', 'String', 'ZL-Factor',...
@@ -135,19 +145,19 @@ zl_factor_lbl=uicontrol(tab2, 'Style', 'text', 'String', 'ZL-Factor',...
 
 %*************************defining texts****************************
 peakpos_txt=uicontrol(tab2, 'Style', 'edit', 'String', '707.8',...
-    'Position', [75 255 60 17], 'horizontalalignment','right',...
+    'Position', [75 255 60 20], 'horizontalalignment','right',...
     'backgroundcolor', [1 1 1],'Callback', @edit_cb);
 fitbkg_A_txt=uicontrol(tab2,'Style','edit', 'String','',...
-    'Position', [75 200 60 17], 'horizontalalignment','right',...
+    'Position', [75 200 60 20], 'horizontalalignment','right',...
     'backgroundcolor', [1 1 1],'Callback', @edit_cb);
 fitbkg_r_txt=uicontrol(tab2,'Style','edit','String','',...
-    'Position', [75 180 60 17], 'horizontalalignment', 'right',...
+    'Position', [75 180 60 20], 'horizontalalignment', 'right',...
     'backgroundcolor', [1 1 1],'Callback', @edit_cb);
 fwhm_decon_txt=uicontrol(tab2, 'style', 'edit', 'string','',...
-    'Position', [75 102 60 17], 'horizontalalignment', 'right',...
+    'Position', [75 102 60 20], 'horizontalalignment', 'right',...
     'backgroundcolor', [1 1 1],'Callback', @edit_cb);
 zl_factor_txt=uicontrol(tab2, 'Style', 'edit', 'String', '1',...
-    'Position', [75 82 60 17], 'horizontalalignment', 'right',...
+    'Position', [75 82 60 20], 'horizontalalignment', 'right',...
     'backgroundcolor', [1 1 1],'Callback', @edit_cb);
 
 %***********************pop-up menu******************************
@@ -167,38 +177,38 @@ tab3=uitab(hTabGroup, 'title','Fe edge');
 edgepos_lbl=uicontrol(tab3,'style','text', 'string', 'Edgepos:',...
     'Position', [10 295 60 15], 'horizontalalignment', 'right');
 h1_lbl=uicontrol(tab3, 'style', 'text', 'String', 'h1:',...
-    'Position', [10 250 60 15], 'horizontalalignment', 'right');
+    'Position', [10 240 60 15], 'horizontalalignment', 'right');
 h2_lbl=uicontrol(tab3, 'style', 'text', 'String', 'h2:',...
-    'Position', [10 230 60 15], 'horizontalalignment', 'right');
+    'Position', [10 220 60 15], 'horizontalalignment', 'right');
 feratio_lbl=uicontrol(tab3, 'style', 'text', 'String', 'Ferric iron ratio:',...
-    'Position', [10 180 110 15], 'horizontalalignment', 'left');
+    'Position', [10 170 110 15], 'horizontalalignment', 'left');
 int_lbl=uicontrol(tab3, 'style', 'text','String','Int method:',...
-    'Position', [10 160 60 15], 'horizontalalignment','right');
+    'Position', [10 150 60 15], 'horizontalalignment','right');
 fit_lbl=uicontrol(tab3, 'style', 'text','string','Fit method:',...
-    'Position', [10 140 60 15], 'horizontalalignment','right');
+    'Position', [10 130 60 15], 'horizontalalignment','right');
 
 %***************************defining texts*****************************
 edgepos2_txt=uicontrol(tab3,'style','edit', 'string', '707.8',...
-    'Position', [75 295 60 17], 'horizontalalignment', 'right',...
+    'Position', [75 295 60 20], 'horizontalalignment', 'right',...
     'backgroundcolor', [1 1 1], 'Callback', @edit_cb);
 h1_txt=uicontrol(tab3, 'Style', 'edit', 'String', '',...
-    'Position', [75 250 60 17],'horizontalalignment', 'right',...
+    'Position', [75 240 60 20],'horizontalalignment', 'right',...
     'backgroundcolor', [1 1 1],'Callback', @edit_cb);
 h2_txt=uicontrol(tab3, 'Style', 'edit','String', '',...
-    'Position', [75 230 60 17],'horizontalalignment','right',...
+    'Position', [75 220 60 20],'horizontalalignment','right',...
     'backgroundcolor', [1 1 1],'Callback', @edit_cb);
 int_txt=uicontrol(tab3, 'style', 'edit', 'String','',...
-    'Position', [75 160 60 17], 'horizontalalignment','right',...
+    'Position', [75 150 60 20], 'horizontalalignment','right',...
     'backgroundcolor' , [1 1 1],'Callback', @edit_cb);
 fit_txt=uicontrol(tab3,'style', 'edit', 'String','',...
-    'Position', [75 140 60 17], 'horizontalalignment', 'right',...
+    'Position', [75 130 60 20], 'horizontalalignment', 'right',...
     'backgroundcolor', [1 1 1],'Callback', @edit_cb);
 
 %**************************defining buttons****************************
 defineedge2_btn=uicontrol(tab3, 'style', 'Pushbutton', 'String', 'Define edge',...
-    'Position', [40 270 95 22], 'callback', @defineedge_btn_click);
+    'Position', [40 265 95 27], 'callback', @defineedge_btn_click);
 fittan_btn=uicontrol(tab3, 'style', 'Pushbutton', 'String', 'FitTan',...
-    'Position', [40 205 95 22], 'callback', @fittan_btn_click);
+    'Position', [40 185 95 27], 'callback', @fittan_btn_click);
 
 
 %**********************************************************************
@@ -211,43 +221,43 @@ tab4=uitab(hTabGroup, 'title','General');
 
 %labels for the range output
 uicontrol(tab4, 'style', 'text', 'String','Range:',...
-    'Position', [10 310 60 15], 'horizontalalignment','right');
+    'Position', [10 300 60 15], 'horizontalalignment','right');
 uicontrol(tab4,'style', 'text', 'String', '-',...
-    'Position', [115 310 10 15],'horizontalalignment', 'center');
+    'Position', [115 300 10 15],'horizontalalignment', 'center');
 uicontrol(tab4,'style', 'text', 'String', 'eV',...
-    'Position',[170 310 30 14],'horizontalalignment', 'left');
+    'Position',[170 300 30 14],'horizontalalignment', 'left');
 
-range1_txt=uicontrol(tab4,'style', 'edit', 'String', '440',...
+range1_txt=uicontrol(tab4,'style', 'edit', 'String', '680',...
     'backgroundcolor', [1 1 1], 'horizontalalignment', 'right',...
-    'Position', [75 310 40 17], 'callback', @range_txt_callback);
-range2_txt=uicontrol(tab4,'style', 'edit', 'String', '500',...
+    'Position', [75 300 40 20], 'callback', @range_txt_callback);
+range2_txt=uicontrol(tab4,'style', 'edit', 'String', '750',...
     'backgroundcolor', [1 1 1], 'horizontalalignment', 'right',...
-    'Position', [125 310 40 17], 'callback', @range_txt_callback);
+    'Position', [125 300 40 20], 'callback', @range_txt_callback);
 
 %************************define edge***********************************
 uicontrol(tab4, 'style', 'text', 'String', 'EdgePos:',...
-    'Position', [10 290 60 15], 'horizontalalignment', 'right');
+    'Position', [10 280 60 15], 'horizontalalignment', 'right');
 
-edgepos3_txt=uicontrol(tab4,'style', 'edit','string', '450',...
+edgepos3_txt=uicontrol(tab4,'style', 'edit','string', '707.8',...
     'backgroundcolor', [1 1 1],'horizontalalignment', 'right',...
-    'Position', [75 290 40 17],'callback',@edit_cb);
+    'Position', [75 280 40 20],'callback',@edit_cb);
 
 defineedge3_btn=uicontrol(tab4, 'style', 'Pushbutton', 'String', 'Def edge',...
-    'Position', [170 288 50 20], 'callback', @defineedge_btn_click);
+    'Position', [170 279 50 20], 'callback', @defineedge_btn_click);
 
 
 %************************fit arcus tangens******************************
 fittan2_btn=uicontrol(tab4,'style', 'pushbutton', 'string', 'FitTan',...
-    'Position', [170 268 50 20], 'callback', @fittan_btn_click);
+    'Position', [170 258 50 20], 'callback', @fittan_btn_click);
 
 uicontrol(tab4, 'style','text','String','Inflections:',....
-    'Position', [10 270 60 15],'horizontalalignment', 'right');
+    'Position', [10 260 60 15],'horizontalalignment', 'right');
 
 inf1_txt=uicontrol(tab4, 'style', 'edit', 'horizontalalignment', 'right',...
-    'backgroundcolor', [1 1 1 ],'Position', [75 270 40 17], 'String', '457.5',...
+    'backgroundcolor', [1 1 1 ],'Position', [75 260 40 20], 'String', '708.65',...
     'callback', @edit_cb);
 inf2_txt=uicontrol(tab4, 'style', 'edit', 'horizontalalignment', 'right',...
-    'backgroundcolor', [1 1 1 ],'Position', [125 270 40 17], 'String', '463.0',...
+    'backgroundcolor', [1 1 1 ],'Position', [125 260 40 20], 'String', '721.65',...
     'callback', @edit_cb);
 
 ti_atan_cb=uicontrol(tab4,'style', 'checkbox', 'String','Ti arctan',...
@@ -257,19 +267,19 @@ ti_atan_cb=uicontrol(tab4,'style', 'checkbox', 'String','Ti arctan',...
 %*********************control fitting*************************************
 
 site_num_txt=uicontrol(tab4, 'Style', 'edit','Horizontalalignment','right',...
-    'backgroundcolor', [1 1 1], 'string','1', 'Position', [10 227 20 17],...
+    'backgroundcolor', [1 1 1], 'string','1', 'Position', [10 227 20 20],...
     'callback', @graphnr_txt_edit,'enable','inactive');
 site_num_cnt=uicontrol(tab4, 'style','slider', 'Max', 10, 'Min',1,...
-    'value', 1,'SliderStep',[0.05 0.2],'position',[33 227 13 17],...
+    'value', 1,'SliderStep',[0.05 0.2],'position',[33 227 13 20],...
     'callback', @graphnr_cnt_click, 'enable', 'inactive');
 site_type_pop=uicontrol(tab4, 'style', 'popupmenu',...
     'String', {'Gaussian', 'Lorentzian', 'PseudoVoigt'},...
-    'Position', [55 228 90 17], 'backgroundcolor', [1 1 1]);
+    'Position', [55 228 115 20], 'backgroundcolor', [1 1 1]);
 
 add_btn=uicontrol(tab4, 'style', 'Pushbutton', 'String', '+',...
-    'Position', [150 225 20 20], 'callback', @add_btn_click);
+    'Position', [175 227 20 20], 'callback', @add_btn_click);
 delete_btn=uicontrol(tab4,'style', 'pushbutton', 'string', '-',...
-    'Position', [175 225 20 20], 'callback', @delete_btn_click);
+    'Position', [200 227 20 20], 'callback', @delete_btn_click);
 
 
 %********************definine site_param panel**************************
@@ -282,10 +292,10 @@ uicontrol(site_pan, 'Style', 'text', 'String', '+-',...
     'Position', [115 65 20 15],'horizontalalignment', 'center');
 center_txt=uicontrol(site_pan,'style','edit', 'string','',...
     'backgroundcolor', [1 1 1], 'horizontalalignment', 'right',...
-    'Position', [65 65 50 17], 'callback', @center_txt_callback);
+    'Position', [65 65 50 20], 'callback', @center_txt_callback);
 center_bd_txt=uicontrol(site_pan,'style','edit', 'string','2',...
     'backgroundcolor', [1 1 1], 'horizontalalignment', 'right',...
-    'Position', [135 65 40 17], 'callback', @center_bd_txt_callback);
+    'Position', [135 65 40 20], 'callback', @center_bd_txt_callback);
 center_cb=uicontrol(site_pan,'style', 'checkbox', 'String','',...
     'Value', 1, 'Position',[180 67 15 15],...
     'callback', @center_cb_click);
@@ -296,10 +306,10 @@ uicontrol(site_pan, 'Style', 'text', 'String', '+-',...
     'Position', [115 45 20 15],'horizontalalignment', 'center');
 fwhm_site_txt=uicontrol(site_pan,'style','edit', 'string','',...
     'backgroundcolor', [1 1 1], 'horizontalalignment', 'right',...
-    'Position', [65 45 50 17], 'callback', @fwhm_site_txt_callback);
+    'Position', [65 45 50 20], 'callback', @fwhm_site_txt_callback);
 fwhm_site_bd_txt=uicontrol(site_pan,'style','edit', 'string','2',...
     'backgroundcolor', [1 1 1], 'horizontalalignment', 'right',...
-    'Position', [135 45 40 17], 'callback', @fwhm_site_bd_txt_callback);
+    'Position', [135 45 40 20], 'callback', @fwhm_site_bd_txt_callback);
 fwhm_cb=uicontrol(site_pan,'style', 'checkbox', 'String','',...
     'Value', 1, 'Position',[180 47 15 15],...
     'callback', @fwhm_cb_click);
@@ -310,10 +320,10 @@ uicontrol(site_pan, 'Style', 'text', 'String', '+-',...
     'Position', [115 25 20 15],'horizontalalignment', 'center');
 intensity_txt=uicontrol(site_pan,'style','edit', 'string','',...
     'backgroundcolor', [1 1 1], 'horizontalalignment', 'right',...
-    'Position', [65 25 50 17], 'callback', @intensity_txt_callback);
+    'Position', [65 25 50 20], 'callback', @intensity_txt_callback);
 intensity_bd_txt=uicontrol(site_pan,'style','edit', 'string','0',...
     'backgroundcolor', [1 1 1], 'horizontalalignment', 'right',...
-    'Position', [135 25 40 17], 'callback', @intensity_bd_txt_callback);
+    'Position', [135 25 40 20], 'callback', @intensity_bd_txt_callback);
 intensity_cb=uicontrol(site_pan,'style', 'checkbox', 'String','',...
     'Value', 1, 'Position',[180 27 15 15],...
     'callback', @intensity_cb_click);
@@ -322,7 +332,7 @@ uicontrol(site_pan, 'Style', 'text', 'String', 'Ratio:',...
     'Position', [05 05 55 15],'horizontalalignment', 'right');
 pv_n_txt=uicontrol(site_pan,'style','edit', 'string','',...
     'backgroundcolor', [1 1 1], 'horizontalalignment', 'right',...
-    'Position', [65 05 50 17], 'callback', @pv_n_txt_callback,...
+    'Position', [65 05 50 20], 'callback', @pv_n_txt_callback,...
     'enable','off');
 
 fit_site_btn=uicontrol(site_pan, 'style', 'pushbutton',...
@@ -362,18 +372,18 @@ y_lbl=uicontrol(rpanh2, 'Style','text', 'String', 'Y:',...
     'horizontalalignment','right','Position', [10 180 30 15]); 
 y_out_lbl=uicontrol(rpanh2,'style', 'text', 'string','',...
     'horizontalalignment','right', 'Position', [45 180 65 15]);
-copyright_lbl=uicontrol(rpanh2,'style','text','string','written by C. Prescher',...
-    'horizontalalignment', 'right','Position', [80 1 150 15]);
+copyright_lbl=uicontrol(rpanh2,'style','text','string','written by C. Prescher ',...
+    'horizontalalignment', 'right','Position', [45 1 180 17]);
 
 msg_lbl=uicontrol(rpanh2,'style', 'text', 'horizontalalignment', 'center',...
     'String','','Position', [10 110 125 60]);
 
 saveu_btn=uicontrol(rpanh2,'style','pushbutton','string', 'Save Upper',...
-    'Position', [10 60 125 22], 'callback', @saveu_btn_click);
+    'Position', [10 68 125 30], 'callback', @saveu_btn_click);
 savel_btn=uicontrol(rpanh2,'style','pushbutton', 'string', 'Save Lower',...
-    'Position', [10 35 125 22], 'callback', @savel_btn_click);
+    'Position', [10 35 125 30], 'callback', @savel_btn_click);
 save_graphs=uicontrol(rpanh2, 'style', 'pushbutton', 'string', 'Save Graphs',...
-    'Position', [145 35 83 48], 'callback', @save_graphs_btn_click);
+    'Position', [145 35 83 64], 'callback', @save_graphs_btn_click);
 
 
 
@@ -578,9 +588,14 @@ movegui(fh,'onscreen');
                    set(data_in, 'YLim', yrange);                   
                 end
                 if strcmp(state,'refine_edge')
-                   edge_pos=str2num(get(peakpos_txt, 'string'));
-                   XLim=[edge_pos-10, edge_pos+10];  
-                   set(data_in, 'XLim', XLim);
+                    edge_pos=str2num(get(peakpos_txt, 'string'));
+                    XLim=[edge_pos-10, edge_pos+10];
+                    inside_y_data = data.y(data.x>edge_pos-10 & data.x<edge_pos+10);
+                    y_data_range = max(inside_y_data) - min(inside_y_data);
+                    YLim=[min(inside_y_data)-0.05*y_data_range,...
+                         max(inside_y_data)+0.05*y_data_range];
+                    set(data_in, 'XLim', XLim);
+                    set(data_in, 'YLim', YLim);
                 end      
                 if strcmp(state, 'define_zl2') 
                    x(1)=str2double(get(edgelpos_txt,'string'));
@@ -607,18 +622,42 @@ movegui(fh,'onscreen');
                 axes(data_in);
                 plot(data_in, data.x,data.y,'b.');                
                 hold on;
+                
+                %vertical line
+                x(1)=pos1(1,1);
+                x(2)=x(1);
+                y=ylim;    
                 plot(data_in, x,y,'r--');
+                
+ %               %horizontal line
+ %               x=XLim1;
+ %               y(1)=pos1(1,2);
+ %               y(2)=y(1);
+ %               plot(data_in,x,y,'r--');
                 if strcmp(state, 'define_atan2') || strcmp(state,'define_atan3');
                    atan_data=getappdata(0,'atan_data');
                    x(1)=atan_data.zero;
                    x(2)=x(1);
                    y=YLim1;
                    plot(data_in,x,y,'r-');
+                   
+ %                  %horizontal line
+ %                  x=XLim1;
+ %                  y(1)=atan_data.y1;
+ %                  y(2)=y(1);
+ %                  plot(data_in,x,y,'r-');
+                   
                    if strcmp(state, 'define_atan3')
                        atan_data=getappdata(0,'atan_data');
                        x(1)=atan_data.h1;
                        x(2)=x(1);
                        y=YLim1;
+                       plot(data_in,x,y,'r-');
+
+ %                      %horizontal line
+ %                     x=XLim1;
+ %                      y(1)=atan_data.y2;
+ %                      y(2)=y(1);
                        plot(data_in,x,y,'r-');
                    end
                 end 
@@ -733,9 +772,6 @@ movegui(fh,'onscreen');
             case tab4
                 data_in=data_in4; 
                 data_out=data_out4;
-                
-                
-                
         end                  
         pos=get(data_in,'currentpoint');
         pos2=get(data_out,'currentpoint');
@@ -746,6 +782,26 @@ movegui(fh,'onscreen');
         if pos(1,1)>=XLim(1) && pos(1,1)<=XLim(2) && ...
                 pos(1,2)>=YLim(1) && pos(1,2)<=YLim(2)            
            state=getappdata(0,'state');
+           if strcmp(state, 'define_zl1') || strcmp(state,'define_zl2') ||...
+                    strcmp(state,'define_edge') || strcmp(state,'refine_edge') ||...
+                    strcmp(state,'fit_bkg1') || strcmp(state,'fit_bkg2') || ...
+                    strcmp(state,'define_edge2') || strcmp(state,'define_edge3')
+                if strcmp(state,'define_zl1') || strcmp(state,'define_zl2')
+                    data=getappdata(0, 'zl_data');
+                elseif strcmp(state,'define_edge') || strcmp(state,'refine_edge')
+                  switch selected_tab
+                    case tab2
+                      data_str='edge_data';  
+                    case tab3
+                      data_str='fe_data';
+                    case tab4
+                      data_str='general_data';
+                  end              
+                  data=getappdata(0,data_str);
+                else                   
+                    data=getappdata(0, 'edge_data');
+                end
+            end
            if strcmp(state,'define_zl1')
                set(edgelpos_txt,'string', str2double(get(x_out_lbl,'string')));
                set(msg_lbl,'string', 'Please define the right boundary of the zero-loss peak');
@@ -1199,7 +1255,7 @@ movegui(fh,'onscreen');
     function fitbkg_btn_click(hObject, eventdata)
         setappdata(0, 'state', 'fit_bkg1');
     end
-    function decon_btn_click(hObject,eventdata)
+    function decon_frat_click(~,~)      
         data_bs=getappdata(0,'edge_data_bs');
         data_zl=getappdata(0,'zl_data');
         step=mean(diff(data_bs.x));
@@ -1215,7 +1271,64 @@ movegui(fh,'onscreen');
         
         
         plot(data_in2, data_bs.x,data_bs.y);
-%         plot(data_in2, data_zl.x,data_zl.y);
+        fwhm_decon=str2double(get(fwhm_decon_txt,'string'));
+        fwhm_zl=str2double(get(fwhm_txt,'string'));
+        
+%         method=get(decon_pop,'value');
+%         switch method
+%             case 1
+%                 att=gauss_curve(400,fwhm_decon./step*2,max(data_zl.y)*sqrt(pi)*fwhm_zl/1.6652,(1:size(data_zl.x,1)));         
+%             case 2
+%                 att=lorentz_curve(400,fwhm_decon./step*2,max(data_zl.y).*pi.*fwhm_zl./2,(1:size(data_zl.x,1))); 
+%         end      
+%         num_chan=min([size(data_bs.x,2), size(data_zl.x,1), length(att)]);
+%         data_decon.y=ifft(fft(att(1:num_chan))'.*fft(data_bs.y(1:num_chan))./fft(data_zl.y(1:num_chan)));
+%         data_decon.x=data_bs.x(1:num_chan);
+       data_decon=frat(data_zl,fwhm_decon,data_bs); 
+        plot(data_out2, data_decon.x,data_decon.y);    
+        
+        %now shifting the data two original position:
+        
+        
+        plot(data_out2, data_decon.x,data_decon.y);
+        setappdata(0,'data_decon', data_decon);
+        setappdata(0,'general_data',data_decon);     
+        setappdata(0,'fit_data',data_decon);  
+        setappdata(0,'ylim', [min(data_decon.y)*0.95 max(data_decon.y)*1.05]);
+       
+        axes(data_in4);
+        plot(data_decon.x, data_decon.y);
+        xlim([str2double(get(range1_txt,'string')) str2double(get(range2_txt,'string'))]);
+        set(data_in4, 'visible','off');
+        set(get(data_in4, 'children'), 'visible','off');
+        
+        fe_indices=find(data_decon.x>700 & data_decon.x<740);
+        fe_data.x=data_decon.x(fe_indices);
+        fe_data.y=data_decon.y(fe_indices);
+        fe_data.y=fe_data.y - min(fe_data.y);
+        plot(data_in3, fe_data.x,fe_data.y);
+        set(data_in3, 'visible','off');
+        set(get(data_in3, 'children'), 'visible','off');
+        setappdata(0,'fe_data',fe_data);      
+        setappdata(0,'tab3_in_data', fe_data);
+    end
+
+    function decon_btn_click(~,~)
+        data_bs=getappdata(0,'edge_data_bs');
+        data_zl=getappdata(0,'zl_data');
+        step=mean(diff(data_bs.x));
+        
+        %scale the zeroloss peak if the deconvolution is too strong and if
+        %the zeroloss peak was taken from another point than the spectrum
+        
+        zl_factor=str2double(get(zl_factor_txt,'String'));
+        lb=str2double(get(edgelpos_txt,'String'));
+        rb=str2double(get(edgerpos_txt,'String'));
+        scale_ind=find(data_zl.x>lb & data_zl.x<rb);
+        data_zl.y(scale_ind)=data_zl.y(scale_ind)*zl_factor;
+        
+        
+        plot(data_in2, data_bs.x,data_bs.y);
         fwhm_decon=str2double(get(fwhm_decon_txt,'string'))/2;
         fwhm_zl=str2double(get(fwhm_txt,'string'));
         
@@ -1229,6 +1342,7 @@ movegui(fh,'onscreen');
         num_chan=min([size(data_bs.x,2), size(data_zl.x,1), length(att)]);
         data_decon.y=ifft(fft(att(1:num_chan))'.*fft(data_bs.y(1:num_chan))./fft(data_zl.y(1:num_chan)));
         data_decon.x=data_bs.x(1:num_chan);
+%         data_decon=frat(data_zl,fwhm_decon,data_bs); 
         plot(data_out2, data_decon.x,data_decon.y);    
         
         %now shifting the data two original position:
@@ -1246,6 +1360,9 @@ movegui(fh,'onscreen');
         misc.y((shift+1):l)=data_decon.y(1: l-shift);
         misc.y=misc.y';
         cla(data_out2);
+        data_decon.x=misc.x;
+        data_decon.y=misc.y;
+
         plot(data_out2, misc.x,misc.y);
         setappdata(0,'data_decon', misc);
         setappdata(0,'general_data',misc);     
@@ -1774,7 +1891,13 @@ movegui(fh,'onscreen');
         fdata.y=zl_data.y(ind);
         
         %ftting zl_data to Lorentzian model:
-        model=@(x,xdata)(lorentz_curve(x(1),x(2),x(3),xdata));
+        method=get(peak_shape_pop,'value');
+        switch method
+            case 1
+                model=@(x,xdata)(lorentz_curve(x(1),x(2),x(3),xdata));
+            case 2
+                model=@(x,xdata)(gauss_curve(x(1),x(2),x(3),xdata));
+        end
         ival=[lpos+(rpos-lpos/2) ...
             (rpos-lpos)/4 ...
             max(fdata.y)];
@@ -1869,6 +1992,10 @@ movegui(fh,'onscreen');
        %calulating arctan function
        h1=data.y(h1_ind)-data.y(zero_ind);
        h2=data.y(h2_ind)-h1-data.y(zero_ind);
+
+%       data.y=data.y-atan_data.y1;
+%       h1=atan_data.y2-atan_data.y1;
+%       h2=atan_data.y3-h1-atan_data.y1;
        bkg=h1/pi*(atan(pi*(data.x-708.65))+pi/2)+h2/pi*(...
            atan(pi*(data.x-721.65))+pi/2);
            
@@ -1887,7 +2014,7 @@ movegui(fh,'onscreen');
        l3_int=trapz(data.x(range1), final_data.y(range1));
        l2_int=trapz(data.x(range2), final_data.y(range2));
         
-       %l\F6sen der quadratischen Gleichung
+       %lÃ¶sen der quadratischen Gleichung
        ratio=l3_int/l2_int;
        a=0.193; b= -0.465; c=0.366;
        l=(ratio+1)*a; m=(ratio+1)*b; n=(ratio+1).*c-1;
@@ -1988,6 +2115,14 @@ movegui(fh,'onscreen');
        if (atan_data.h1-data.x(h1_ind)) < step/2
            h1_ind=h1_ind+1;
        end
+        h2_ind=find(data.x<atan_data.h2,1,'last');
+        if (atan_data.h2-data.x(h2_ind)) < step/2
+            h2_ind=h2_ind+1;
+        end
+        
+        %calulating arctan function
+        h1=data.y(h1_ind)-data.y(zero_ind);
+        h2=data.y(h2_ind)-h1-data.y(zero_ind);
        
        if get(ti_atan_cb,'value')
            h2=(data.y(h1_ind)-data.y(zero_ind))/2; 
