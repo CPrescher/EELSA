@@ -574,9 +574,9 @@ movegui(fh,'onscreen');
                 end
                 x(1)=pos1(1,1);
                 x(2)=x(1);
-                y=YLim1;               
+                y=YLim1;  
+                axes(data_in);             
                 cla(data_in);
-                axes(data_in);
                 
                 plot(data_in, data.x,data.y,'b-');
                 hold on;
@@ -617,9 +617,9 @@ movegui(fh,'onscreen');
                
                 x(1)=pos1(1,1);
                 x(2)=x(1);
-                y=YLim1;               
+                y=YLim1;  
+                axes(data_in);          
                 cla(data_in);
-                axes(data_in);
                 plot(data_in, data.x,data.y,'b.');                
                 hold on;
                 
@@ -706,6 +706,8 @@ movegui(fh,'onscreen');
 
                 %plotting all data
                 %to define the main output plot
+                axis(data_in);
+                cla(data_in);
                 plot(data_in, x,y,'r-');
                 hold on;
                 plot_all();
@@ -2157,7 +2159,6 @@ movegui(fh,'onscreen');
         site_cur=getappdata(0,'site_cur');
         site_num=getappdata(0,'site_num');
         data=getappdata(0,'fit_data');
-        axes(data_in4);
         plot(data.x,data.y,'b.');
         hold on;
         all=0;
@@ -2173,10 +2174,6 @@ movegui(fh,'onscreen');
         if site_num>0
             plot(data.x, all, 'g-');
         end
-        xrange=getappdata(0,'XLim');
-        yrange=getappdata(0,'YLim');
-        xlim(xrange);
-        ylim(yrange);
         hold off;
     end
     function update_txt()  
